@@ -85,6 +85,15 @@ class MainActivity : AppCompatActivity() {
             Log.i("Current latitude","$latitude")
             val longitude=mLastLocation?.longitude
             Log.i("Current latitude","$longitude")
+            getLocationWeatherDetails()
+        }
+    }
+    private fun getLocationWeatherDetails(){
+        if(Constants.isNetworkAvailable(this)){
+            Toast.makeText(this,"You have connected the internet",Toast.LENGTH_SHORT).show()
+        }else{
+            Toast.makeText(this,"No internet connection",Toast.LENGTH_SHORT).show()
+
         }
     }
     private fun showRationalDialogForPermission() {
