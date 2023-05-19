@@ -1,6 +1,7 @@
 package com.example.weatherapp
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -26,6 +27,7 @@ import retrofit.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var mFusedLocationProviderClient: FusedLocationProviderClient
+    private var mProgressDialog:Dialog?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -101,9 +103,11 @@ class MainActivity : AppCompatActivity() {
             val listCall: Call<WeatherResponse> = service.getWeather(
                 latitude,longitude,Constants.METRIC_UNIT,Constants.APP_ID
             )
+            showCustomProgressDialog()
             listCall.enqueue(object : Callback<WeatherResponse>{
                 override fun onResponse(response: Response<WeatherResponse>?, retrofit: Retrofit?) {
                     if(response!!.isSuccess){
+                        hideProgressDialog()
                         val weatherList:WeatherResponse=response.body()
                         Log.i("Response result","$weatherList")
                     }else{
@@ -124,6 +128,7 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onFailure(t: Throwable?) {
                     Log.e("Errorr ",t!!.message.toString())
+                    hideProgressDialog()
 
                 }
 
@@ -152,6 +157,17 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun showCustomProgressDialog(){
+        mProgressDialog= Dialog(this)
+        mProgressDialog!!.setContentView(R.layout.dialog_custom_progress)
+        mProgressDialog!!.show()
+    }
+
+    private fun hideProgressDialog(){
+        if (mProgressDialog!=null){
+            mProgressDialog!!.dismiss()
+        }
+    }
     private fun isLocationEnabled(): Boolean {
         val locationManager: LocationManager =
             getSystemService(Context.LOCATION_SERVICE) as LocationManager
