@@ -15,6 +15,7 @@ import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.example.weatherapp.databinding.ActivityMainBinding
 import com.example.weatherapp.models.WeatherResponse
 import com.example.weatherapp.network.WeatherService
 import com.google.android.gms.location.*
@@ -28,9 +29,11 @@ import retrofit.*
 class MainActivity : AppCompatActivity() {
     private lateinit var mFusedLocationProviderClient: FusedLocationProviderClient
     private var mProgressDialog:Dialog?=null
+    private var binding:ActivityMainBinding?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding= ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding?.root)
 
         mFusedLocationProviderClient=LocationServices.getFusedLocationProviderClient(this)
 
@@ -109,6 +112,7 @@ class MainActivity : AppCompatActivity() {
                     if(response!!.isSuccess){
                         hideProgressDialog()
                         val weatherList:WeatherResponse=response.body()
+                        setUpUI(weatherList)
                         Log.i("Response result","$weatherList")
                     }else{
                         val rc=response.code()
@@ -162,7 +166,22 @@ class MainActivity : AppCompatActivity() {
         mProgressDialog!!.setContentView(R.layout.dialog_custom_progress)
         mProgressDialog!!.show()
     }
+private fun setUpUI(weatherList:WeatherResponse){
+    for (i in weatherList.weather.indices){
+        Log.i("weather name",weatherList.weather.toString())
+        binding?.tvMain?.text=weatherList.weather[i].main
+        binding?.tvMainDescription?.text=weatherList.weather[i].description
+        binding?.tvTemp?.text=weatherList.main.temp.toString() + getUnit(application.resources.configuration.locales.toString())
+    }
+}
 
+    private fun getUnit(value: String):String?{
+        var value="°C"
+        if ("US"==value||"LR"==value||"MM"==value){
+            value="°F"
+        }
+        return value
+    }
     private fun hideProgressDialog(){
         if (mProgressDialog!=null){
             mProgressDialog!!.dismiss()
@@ -174,5 +193,10 @@ class MainActivity : AppCompatActivity() {
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
             LocationManager.NETWORK_PROVIDER
         )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding=null
     }
 }
