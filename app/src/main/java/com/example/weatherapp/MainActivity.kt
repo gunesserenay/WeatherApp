@@ -25,6 +25,8 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import retrofit.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var mFusedLocationProviderClient: FusedLocationProviderClient
@@ -171,7 +173,17 @@ private fun setUpUI(weatherList:WeatherResponse){
         Log.i("weather name",weatherList.weather.toString())
         binding?.tvMain?.text=weatherList.weather[i].main
         binding?.tvMainDescription?.text=weatherList.weather[i].description
-        binding?.tvTemp?.text=weatherList.main.temp.toString() + getUnit(application.resources.configuration.locales.toString())
+        binding?.tvTemp?.text=
+            "${weatherList.main.temp}${getUnit(application.resources.configuration.locales.toString())}"
+        binding?.tvSunriseTime?.text=unixTime(weatherList.sys.sunrise)
+        binding?.tvSunsetTime?.text=unixTime(weatherList.sys.sunset)
+        binding?.tvHumidity?.text=weatherList.main.humidity.toString()+" per cent"
+        binding?.tvMin?.text=weatherList.main.temp_min.toString()+" min"
+        binding?.tvMax?.text=weatherList.main.temp_max.toString()+" max"
+        binding?.tvSpeed?.text=weatherList.wind.speed.toString()
+        binding?.tvName?.text=weatherList.name
+        binding?.tvCountry?.text=weatherList.sys.country
+
     }
 }
 
@@ -181,6 +193,13 @@ private fun setUpUI(weatherList:WeatherResponse){
             value="°F"
         }
         return value
+    }
+
+    private fun unixTime(timex:Long):String?{
+    val date=Date(timex*1000L)
+        val sdf=SimpleDateFormat("HH:mm", Locale.getDefault())
+        sdf.timeZone= TimeZone.getDefault()
+        return sdf.format(date)
     }
     private fun hideProgressDialog(){
         if (mProgressDialog!=null){
