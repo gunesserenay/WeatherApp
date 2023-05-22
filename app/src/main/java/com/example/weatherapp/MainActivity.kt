@@ -13,6 +13,8 @@ import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.example.weatherapp.databinding.ActivityMainBinding
@@ -206,6 +208,22 @@ private fun setUpUI(weatherList:WeatherResponse){
     }
 }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main,menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+       return when(item.itemId){
+           R.id.action_refresh->{
+               requestLocationData()
+               true
+           }else->{
+               super.onOptionsItemSelected(item)
+           }
+       }
+    }
     private fun getUnit(value: String):String?{
         var value="°C"
         if ("US"==value||"LR"==value||"MM"==value){
